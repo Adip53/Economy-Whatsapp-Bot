@@ -4,7 +4,7 @@ example code with level
 # how to run
 npm i
 
-open star.cmd
+open run.cmd
 
 # feature
 level:y
