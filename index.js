@@ -58,10 +58,10 @@ function start(adip) {
       console.log(`[CHAT]@${pushname} In Group ${name || formattedTitle}:${message.body}`)
     }
     if (isCmd && !isGroupMsg) {
-      console.log(`[CHAT]@${pushname} Message In Dm:${message.body}`)
+      console.log(`[CMD]@${pushname} Command In Dm:${message.body}`)
     }
     if (isCmd && isGroupMsg) {
-      console.log(`[CMD]@${pushname} In Group ${name || formattedTitle}:${message.body}`)
+      console.log(`[CMD]@${pushname} C  Command In Group ${name || formattedTitle}:${message.body}`)
     }
     //level system with json
     var addXP = Math.floor(Math.random() * 8) + 3;
