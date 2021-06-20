@@ -1,28 +1,28 @@
 # Economy-Whatsapp-Bot
-example code with level
+- example code with level
 
 # HOW TO RUN
-npm i
+- npm i
 
-open run.cmd
+- open run.cmd
 
 # FEATURE
-register:y
+- register:y
 
-level:y
+- level:y
 
-bal:y
+- bal:y
 
-transfer:coming
+- transfer:coming
 
-withdraw:coming
+- withdraw:coming
 
-deposit:bug
+- deposit:bug
 
-bet:coming
+- bet:coming
 
 # AUTHOR
 
-Adip:https://github.com/AdipSG
+- Adip:https://github.com/AdipSG
 
-iFanpS:https://github.com/iFanpS
+- iFanpS:https://github.com/iFanpS
