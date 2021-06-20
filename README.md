@@ -1,12 +1,12 @@
 # Economy-Whatsapp-Bot
 example code with level
 
-# how to run
+# HOW TO RUN
 npm i
 
 open run.cmd
 
-# feature
+# FEATURE
 register:y
 
 level:y
@@ -20,3 +20,9 @@ withdraw:coming
 deposit:bug
 
 bet:coming
+
+# AUTHOR
+
+Adip:https://github.com/AdipSG
+
+iFanps:https://github.com/iFanpS
