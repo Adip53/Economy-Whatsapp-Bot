@@ -10,14 +10,15 @@ const prefix = config.prefix
 const ownerNumber = config.owner
 const premi = config.premi
 
-//level file
-const xpfile = require('./db/level.json')
-
 //database
+const xpfile = require('./db/level.json')
+const regis = JSON.parse(fs.readFileSync('./db/nomor.json'))
+const users = require('./db/user.json')
 
 //mesage
-const regis = 'Kamu Telah Register'
-const notregis = 'Kamu Belum Register Silahkan Ketik /register Untuk Register Akun Anda'
+const yregis = 'Kamu Telah Register'
+const notregis = 'Kamu Belum Register Silahkan Ketik /register Nama Untuk Register Akun Anda'
+const kosong = 'Text Kosong'
 
 function start(adip) {
   console.clear()
@@ -47,18 +48,20 @@ function start(adip) {
     const isOwnerBot = ownerNumber.includes(sender.id)
     const pengirim = sender.id
     const isPremi = premi.includes(sender.id)
+    const isRegis = regis.includes(sender.id)
+
     //logs chat & cmd
     if (!isCmd && !isGroupMsg) {
       console.log(`[CHAT]@${pushname} Message In Dm:${message.body}`)
     }
     if (!isCmd && isGroupMsg) {
-      console.log(`[CHAT]@${pushname} Message In Group ${name || formattedTitle}:${message.body}`)
+      console.log(`[CHAT]@${pushname} In Group ${name || formattedTitle}:${message.body}`)
     }
     if (isCmd && !isGroupMsg) {
-      console.log(`[CMD]@${pushname} Command In Dm:${message.body}`)
+      console.log(`[CHAT]@${pushname} Message In Dm:${message.body}`)
     }
     if (isCmd && isGroupMsg) {
-      console.log(`[CMD]@${pushname} Command In Group ${name || formattedTitle}:${message.body}`)
+      console.log(`[CMD]@${pushname} In Group ${name || formattedTitle}:${message.body}`)
     }
     //level system with json
     var addXP = Math.floor(Math.random() * 8) + 3;
@@ -67,7 +70,8 @@ function start(adip) {
           xpfile[sender.id] = {
              xp: 0,
              level: 1,
-             reqxp: 1000
+             reqxp: 1000,
+             lbk: 1000
           }
     
           fs.writeFile("./db/level.json", JSON.stringify(xpfile), function(err){
@@ -80,33 +84,79 @@ function start(adip) {
        if(xpfile[sender.id].xp > xpfile[sender.id].reqxp){
           xpfile[sender.id].xp -= xpfile[sender.id].reqxp
           xpfile[sender.id].reqxp *= 1.5
+          xpfile[sender.id].lbk *= 3.5
           xpfile[sender.id].reqxp = Math.floor(xpfile[sender.id].reqxp)
+          xpfile[sender.id].lbk = Math.floor(xpfile[sender.id].lbk)
           xpfile[sender.id].level += 1
     
-          adip.reply(from, "Is now Level *"+xpfile[sender.id].level+"*!", id)
+          adip.sendTextWithMentions(from, `*Is @${sender.id} now Level ${xpfile[sender.id].level}*`)
        }
     
        fs.writeFile("./db/level.json", JSON.stringify(xpfile), function(err){
           if(err) console.log(err)
        })
+    //connect level to all
+    let userInfo = xpfile[sender.id]; // get level, limit bank, xp, reqxp
+    let user = users[sender.id]; //get name kayak discord user.np
     //auto read
     adip.sendSeen(from)
     //economy database
     let uang = db.fetch(`money_${sender.id}`)
     if (uang === null) uang = 0;
+    let bank = db.fetch(`bank_${sender.id}`)
+    if (bank === null) bank = 0;
     //cut msg
     adip.getAmountOfLoadedMessages().then((msg) => (msg >= 3000) && adip.cutMsgCache())
-    //mengetik
-    adip.simulateTyping(from, true)
+    //args
+    const a = args.join(' ')
+    //message bot
+    if (message.body === "adip") {
+      adip.reply(from, `Ya Ada Apa?`, id)
+    }
     //command
     if (command === 'bal') {
-      adip.reply(from, `*Keuangaan Anda*\n\nUang:${uang}`, id)
+      if (!isRegis) return adip.reply(from, notregis, id)
+      adip.reply(from, `*>${user.np}< Balance*\n\n*Uang:${uang.toLocaleString()}*\n*Bank:${bank.toLocaleString()}/${userInfo.lbk.toLocaleString()}*`, id)
     }
+    if (command === 'addme') {
+      if (!isOwnerBot) return adip.reply(from, 'Eits Mau Ngapain? Only Owner Bot', id)
+      db.add(`money_${sender.id}`, a)
+      adip.reply(from, `Berhasil Menanmbahkan Uang Sebanyak ${a.toLocaleString()}`, id)
+    }
+    /*if (command === 'dep') {
+      if (a > uang) return adip.reply(from, 'Uang Tidak Cukup', id)
+      if (bank == userInfo.lbk) return adip.reply(from, 'Bank Kamu Telah Penuh', id)
+      if (a === 'all') {
+        if (bank == 1000) return adip.reply(from, 'Bank Kamu Telah Penuh', id)
+        db.add(`bank_${sender.id}`, uang)
+        db.subtract(`money_${sender.id}`, uang)
+      } else {
+        db.add(`bank_${sender.id}`, a)
+        db.subtract(`money_${sender.id}`, a)
+      }
+    }*/ //masi ngebug tunggu update selanjut nya
     if (command === 'info') {
-      let userInfo = xpfile[sender.id];
+      if (!isRegis) return adip.reply(from, notregis, id)
       adip.reply(from, `Level:${userInfo.level}\nXp:${userInfo.xp}/${userInfo.reqxp}`, id)
     }
-
+    if (command === 'register') {
+      if (isRegis) return adip.reply(from, yregis, id)
+      let tag = Math.floor(Math.random() * 1000)
+      const nama = args.join(' ')
+      if (!nama) return adip.reply(from, 'Isi Namanya\nContoh:/register Adip', id)
+      if(!users[sender.id]){
+        users[sender.id] = {
+           np: `${nama}#${tag}`
+        }
+  
+        fs.writeFile("./db/user.json", JSON.stringify(users), function(err){
+           if(err) console.log(err)
+        })
+     }
+      regis.push(sender.id)
+      fs.writeFileSync('./db/nomor.json', JSON.stringify(regis))
+      adip.reply(from, `Berhasil Daftar\nNama: *${nama}#${tag}*`, id)
+  }
   });
 }
 
