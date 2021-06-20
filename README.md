@@ -7,6 +7,8 @@ npm i
 open run.cmd
 
 # feature
+register:y
+
 level:y
 
 bal:y
@@ -15,6 +17,6 @@ transfer:coming
 
 withdraw:coming
 
-deposit:coming
+deposit:bug
 
 bet:coming
